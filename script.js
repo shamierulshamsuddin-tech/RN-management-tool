@@ -3,7 +3,8 @@ function showTab(id) {
     document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
     document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
     document.getElementById(id).classList.add("active");
-    event.currentTarget.classList.add("active");
+    // Gunakan event untuk mencari butang jika tiada parameter context
+    if (event) event.currentTarget.classList.add("active");
 }
 
 /* --- CONVERT TOOLS --- */
@@ -33,7 +34,7 @@ function clearConvert() {
     document.getElementById("totalInput").innerText = "0";
 }
 
-/* --- SMART COMPARE LOGIC --- */
+/* --- COMPARE LOGIC --- */
 function compareRN() {
     let master = getList("rnNumber");
     let pd101 = getList("pd101");
@@ -48,18 +49,17 @@ function compareRN() {
         let v2 = parts[1]?.trim() || "";
         if(v1) {
             let rn = v1.toUpperCase().includes("RN") ? v1 : (v2.toUpperCase().includes("RN") ? v2 : v1);
-            let file = v1 === rn ? v2 : v1;
+            let file = (v1 === rn) ? v2 : v1;
             jsonMap[rn] = file || "Found";
             jsonRNs.push(rn);
         }
     });
 
     if (master.length === 0) {
-        let combined = [...pd101, ...pd301, ...jsonRNs];
-        master = [...new Set(combined)];
+        master = [...new Set([...pd101, ...pd301, ...jsonRNs])];
     }
 
-    if (master.length === 0) return alert("Please provide data!");
+    if (master.length === 0) return alert("Please provide some data!");
 
     const has101 = pd101.length > 0;
     const has301 = pd301.length > 0;
@@ -79,7 +79,6 @@ function compareRN() {
         let in1 = pd101.includes(rn);
         let in3 = pd301.includes(rn);
         let inJ = jsonMap.hasOwnProperty(rn);
-        
         if(in1) m1++; if(in3) m3++; if(inJ) mJ++;
 
         let row = `<tr><td>${i+1}</td><td>${rn}</td>`;
@@ -91,11 +90,7 @@ function compareRN() {
     });
 
     document.getElementById("totalRnNumber").innerText = master.length;
-    document.getElementById("totalPd101").innerText = pd101.length;
-    document.getElementById("totalPd301").innerText = pd301.length;
-    document.getElementById("totalJson").innerText = jsonLines.length;
-
-    updateDash(master.length, m1, m3, mJ, has101, has301, hasJ);
+    updateDash(master.length, m1, m3, mJ, has1, has3, hasJ);
 }
 
 function updateDash(total, m1, m3, mJ, has1, has3, hasJ) {
@@ -111,30 +106,25 @@ function updateDash(total, m1, m3, mJ, has1, has3, hasJ) {
     let pb = document.getElementById("progressBar");
     pb.style.width = perc + "%";
     pb.innerText = perc + "%";
-    document.getElementById("progressText").innerText = `Overall Data Integrity: ${perc}%`;
+    document.getElementById("progressText").innerText = `Integriti: ${perc}%`;
 }
 
-/* --- EXPORT LOGIC (FIXED FOR PDF SYMBOLS) --- */
+/* --- EXPORT FIX FOR PDF --- */
 function getExportData() {
     const data = [];
     const headers = [];
-    
-    // Ambil header yang sedang aktif
     document.querySelectorAll("table thead th").forEach(th => headers.push(th.innerText));
 
     document.querySelectorAll("#resultTable tr").forEach(tr => {
         const row = [];
         tr.querySelectorAll("td").forEach((td, i) => {
             let val = td.innerText;
-            
-            // Tukar simbol kepada teks sebelum masuk PDF
             if (val.includes("✔️")) {
-                let match = val.match(/\(([^)]+)\)/); // Ambil nama file jika ada
-                val = match ? match[1] : "Yes";
+                let m = val.match(/\(([^)]+)\)/);
+                val = m ? m[1] : "Yes";
             } else if (val.includes("❌")) {
                 val = "No";
             }
-            
             row.push(val);
         });
         data.push(row);
@@ -146,32 +136,12 @@ function downloadPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     const { headers, data } = getExportData();
-    
-    if (data.length === 0) return alert("Sila buat Compare dahulu!");
-
-    // Rekaan Laporan PDF
+    if (!data.length) return;
+    doc.setTextColor(75, 29, 142);
     doc.setFontSize(18);
-    doc.setTextColor(75, 29, 142); 
-    doc.text("RN Management Analysis Report", 14, 20);
-    
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 28);
-
-    doc.autoTable({
-        head: [headers],
-        body: data,
-        startY: 35,
-        theme: 'striped',
-        headStyles: { fillColor: [75, 29, 142] },
-        styles: { fontSize: 8, font: "helvetica" }, // Gunakan font standard untuk elak huruf pelik
-        columnStyles: {
-            0: { cellWidth: 10 },
-            1: { cellWidth: 40 }
-        }
-    });
-
-    doc.save("RN_Professional_Report.pdf");
+    doc.text("RN Analysis Report", 14, 20);
+    doc.autoTable({ head: [headers], body: data, startY: 30, theme: 'striped', headStyles: {fillColor:[75, 29, 142]} });
+    doc.save("RN_Report.pdf");
 }
 
 function downloadCSV() {
@@ -184,7 +154,6 @@ function downloadCSV() {
     link.click();
 }
 
-/* --- HELPERS --- */
 function getList(id) {
     let el = document.getElementById(id);
     return el ? el.value.split("\n").map(x => x.trim()).filter(x => x !== "") : [];
@@ -193,9 +162,5 @@ function getList(id) {
 function clearCompare() {
     ["rnNumber", "pd101", "pd301", "jsonFile"].forEach(id => document.getElementById(id).value = "");
     document.getElementById("resultTable").innerHTML = "";
-    document.getElementById("totalRnNumber").innerText = "0";
-    document.getElementById("totalPd101").innerText = "0";
-    document.getElementById("totalPd301").innerText = "0";
-    document.getElementById("totalJson").innerText = "0";
     updateDash(0,0,0,0,false,false,false);
 }
