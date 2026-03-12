@@ -9,17 +9,25 @@ function checkStrict(str) {
     return /[()_.,]/.test(str);
 }
 
+// UPDATE: Check double quotes
 function convertToSQL() {
     let raw = getList("convertInput");
-    let formatted = raw.map(rn => `'${rn}'`).join(",\n");
+    let formatted = raw.map(rn => {
+        // Jika sudah ada quotes, jangan tambah lagi
+        if (rn.startsWith("'") && rn.endsWith("'")) return rn;
+        return `'${rn}'`;
+    }).join(",\n");
+    
     document.getElementById("convertOutput").value = formatted;
     document.getElementById("totalInput").innerText = raw.length;
     document.getElementById("convertOutput").select();
 }
 
+// UPDATE: Simbol _, (), dikekalkan
 function convertToBase() {
     let raw = document.getElementById("convertInput").value;
-    let cleaned = raw.split(/[\n,]+/).map(x => x.replace(/['"()]/g, "").trim()).filter(x => x);
+    // Hanya buang petikan ' dan " sahaja
+    let cleaned = raw.split(/[\n,]+/).map(x => x.replace(/['"]/g, "").trim()).filter(x => x);
     document.getElementById("convertOutput").value = cleaned.join("\n");
 }
 
