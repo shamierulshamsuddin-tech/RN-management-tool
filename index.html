@@ -3,86 +3,280 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iqbal Tool - RN Management</title>
+    <title>Iqbal RN Tool</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
 <div class="container">
-    <h1>RN Management Tool <span class="badge">Iqbal</span></h1>
 
+    <!-- ── HEADER ── -->
+    <header>
+        <div class="header-left">
+            <div class="logo-wrap">◈</div>
+            <div class="header-text">
+                <h1>RN Management Tool</h1>
+                <p class="subtitle">Iqbal · Mac 2026 · v2.0</p>
+            </div>
+        </div>
+        <div class="header-right">
+            <span class="version-badge">Update Mac 2026</span>
+            <div class="status-pill">
+                <span class="status-dot"></span> Ready
+            </div>
+        </div>
+    </header>
+
+    <!-- ── TABS ── -->
     <div class="tabs">
-        <button class="tab-btn active" onclick="showTab('dashboard')">Dashboard</button>
-        <button class="tab-btn" onclick="showTab('convert')">SQL Helper</button>
-        <button class="tab-btn" onclick="showTab('compare')">RN Compare</button>
+        <button class="tab-btn active" onclick="showTab('dashboard', this)">
+            <span class="tab-icon">▦</span> Dashboard
+        </button>
+        <button class="tab-btn" onclick="showTab('convert', this)">
+            <span class="tab-icon">⌗</span> SQL Helper
+        </button>
+        <button class="tab-btn" onclick="showTab('compare', this)">
+            <span class="tab-icon">⇄</span> RN Compare
+        </button>
     </div>
 
+    <!-- ══════════════════════════════
+         DASHBOARD TAB
+    ══════════════════════════════ -->
     <div id="dashboard" class="tab-content active">
+
         <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon purple"><span class="material-icons">analytics</span></div>
-                <div class="stat-info"><p>Total Unique RN</p><h3 id="dashTotal">0</h3></div>
+            <div class="stat-card c-purple">
+                <div class="stat-icon-row">
+                    <div class="stat-icon">📊</div>
+                </div>
+                <div class="stat-label">Total Unique RN</div>
+                <div class="stat-value" id="dashTotal">0</div>
+                <div class="stat-bar">
+                    <div class="stat-bar-fill" id="barTotal" style="width:0%"></div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon green"><span class="material-icons">check_circle</span></div>
-                <div class="stat-info"><p>PD101 Presence</p><h3 id="dash101">0</h3></div>
+
+            <div class="stat-card c-green">
+                <div class="stat-icon-row">
+                    <div class="stat-icon">✔</div>
+                </div>
+                <div class="stat-label">PD101 Presence</div>
+                <div class="stat-value" id="dash101">0</div>
+                <div class="stat-bar">
+                    <div class="stat-bar-fill" id="bar101" style="width:0%"></div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon blue"><span class="material-icons">fact_check</span></div>
-                <div class="stat-info"><p>PD301 Presence</p><h3 id="dash301">0</h3></div>
+
+            <div class="stat-card c-blue">
+                <div class="stat-icon-row">
+                    <div class="stat-icon">📋</div>
+                </div>
+                <div class="stat-label">PD301 Presence</div>
+                <div class="stat-value" id="dash301">0</div>
+                <div class="stat-bar">
+                    <div class="stat-bar-fill" id="bar301" style="width:0%"></div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon gold"><span class="material-icons">description</span></div>
-                <div class="stat-info"><p>JSON Ready</p><h3 id="dashJson">0</h3></div>
+
+            <div class="stat-card c-amber">
+                <div class="stat-icon-row">
+                    <div class="stat-icon">🗂</div>
+                </div>
+                <div class="stat-label">JSON Ready</div>
+                <div class="stat-value" id="dashJson">0</div>
+                <div class="stat-bar">
+                    <div class="stat-bar-fill" id="barJson" style="width:0%"></div>
+                </div>
             </div>
         </div>
 
         <div class="chart-box">
-            <div class="progress-container">
-                <div id="progressBar" class="progress-bar" style="width: 0%;">0%</div>
+            <div class="chart-header">
+                <span class="chart-title">Overall Coverage</span>
+                <span class="perc-badge" id="percLabel">0%</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progressBar" style="width:0%"></div>
+            </div>
+            <p class="progress-desc" id="progressText">Run a comparison to see coverage stats.</p>
+        </div>
+
+
+    </div>
+
+    <!-- ══════════════════════════════
+         SQL HELPER TAB
+    ══════════════════════════════ -->
+    <div id="convert" class="tab-content">
+
+        <div class="panel-label">Input</div>
+        <textarea id="convertInput" placeholder="Tampal RN di sini, satu baris satu RN..."></textarea>
+
+        <div class="btn-group">
+            <button class="btn-primary" onclick="convertToSQL()">
+                <span>⌗</span> Add SQL Quotes
+            </button>
+            <button class="btn-secondary" onclick="convertToBase()">
+                <span>⌫</span> Remove Formatting
+            </button>
+            <button class="btn-success" onclick="copyOutput()">
+                <span>⎘</span> Copy
+            </button>
+            <button class="btn-danger" onclick="clearConvert()">
+                <span>✕</span> Clear
+            </button>
+        </div>
+
+        <div class="row-count">Rows: <strong id="totalInput">0</strong></div>
+
+        <div class="panel-label" style="margin-top:14px">Output</div>
+        <textarea id="convertOutput" readonly placeholder="Hasil akan muncul di sini..."></textarea>
+    </div>
+
+    <!-- ══════════════════════════════
+         RN COMPARE TAB
+    ══════════════════════════════ -->
+    <div id="compare" class="tab-content">
+
+        <div class="grid">
+            <div class="input-field">
+                <label>Master List</label>
+                <textarea id="rnNumber" placeholder="Satu RN per baris..."></textarea>
+            </div>
+            <div class="input-field">
+                <label>PD101</label>
+                <textarea id="pd101" placeholder="Satu RN per baris..."></textarea>
+            </div>
+            <div class="input-field">
+                <label>PD301</label>
+                <textarea id="pd301" placeholder="Satu RN per baris..."></textarea>
+            </div>
+            <div class="input-field">
+                <label>JSON Mapping <span class="label-hint">(RN | value)</span></label>
+                <textarea id="jsonFile" placeholder="RN123 | nilai&#10;RN456 | nilai2"></textarea>
             </div>
         </div>
-    </div>
 
-    <div id="convert" class="tab-content">
-        <textarea id="convertInput" placeholder="Paste RNs here..."></textarea>
         <div class="btn-group">
-            <button onclick="convertToSQL()">Add SQL Quotes</button>
-            <button onclick="convertToBase()" class="btn-secondary">Remove Formatting</button>
-            <button onclick="copyOutput()" class="btn-success">Copy</button>
-            <button onclick="clearConvert()" class="btn-danger">Clear</button>
+            <button class="btn-primary" onclick="compareRN()">
+                <span>⇄</span> Compare
+            </button>
+            <button class="btn-secondary" onclick="downloadCSV()">
+                <span>↓</span> CSV
+            </button>
+            <button class="btn-success" onclick="downloadPDF()">
+                <span>↓</span> PDF Report
+            </button>
+            <button class="btn-danger" onclick="clearCompare()">
+                <span>✕</span> Clear All
+            </button>
         </div>
-        <div style="font-size: 0.8rem; margin-bottom: 5px;">Rows: <span id="totalInput">0</span></div>
-        <textarea id="convertOutput" readonly placeholder="Result..."></textarea>
-    </div>
 
-    <div id="compare" class="tab-content">
-        <div class="grid">
-            <div class="input-field"><label>Master List</label><textarea id="rnNumber"></textarea></div>
-            <div class="input-field"><label>PD101</label><textarea id="pd101"></textarea></div>
-            <div class="input-field"><label>PD301</label><textarea id="pd301"></textarea></div>
-            <div class="input-field"><label>JSON Mapping</label><textarea id="jsonFile"></textarea></div>
-        </div>
-        
-        <div class="btn-group">
-            <button onclick="compareRN()">Compare</button>
-            <button onclick="downloadCSV()" class="btn-secondary">CSV</button>
-            <button onclick="downloadPDF()" class="btn-success">PDF Report</button>
-            <button onclick="clearCompare()" class="btn-danger">Clear All</button>
+        <!-- Summary Panel -->
+        <div class="summary-panel" id="summaryPanel" style="display:none">
+            <div class="summary-header">
+                <span class="summary-title">📊 Ringkasan Perbandingan</span>
+                <span class="summary-timestamp" id="summaryTime"></span>
+            </div>
+
+            <div class="summary-grid">
+                <div class="sum-card s-purple">
+                    <div class="sum-top">
+                        <span class="sum-label">Total RN</span>
+                        <span class="sum-icon">◈</span>
+                    </div>
+                    <div class="sum-val" id="sumTotal">0</div>
+                    <div class="sum-sub">Unique entries</div>
+                </div>
+                <div class="sum-card s-green">
+                    <div class="sum-top">
+                        <span class="sum-label">Lengkap</span>
+                        <span class="sum-icon">✔</span>
+                    </div>
+                    <div class="sum-val" id="sumComplete">0</div>
+                    <div class="sum-sub" id="sumCompletePct">Ada di semua 3 sumber</div>
+                </div>
+                <div class="sum-card s-amber">
+                    <div class="sum-top">
+                        <span class="sum-label">Separa</span>
+                        <span class="sum-icon">◑</span>
+                    </div>
+                    <div class="sum-val" id="sumPartial">0</div>
+                    <div class="sum-sub" id="sumPartialPct">Ada di 1–2 sumber sahaja</div>
+                </div>
+                <div class="sum-card s-red">
+                    <div class="sum-top">
+                        <span class="sum-label">Tiada</span>
+                        <span class="sum-icon">✘</span>
+                    </div>
+                    <div class="sum-val" id="sumMissing">0</div>
+                    <div class="sum-sub" id="sumMissingPct">Tiada di mana-mana sumber</div>
+                </div>
+            </div>
+
+            <div class="summary-breakdown">
+                <div class="breakdown-title">Pecahan Sumber</div>
+                <div class="breakdown-rows">
+                    <div class="brow">
+                        <span class="brow-label">PD101</span>
+                        <div class="brow-bar-wrap">
+                            <div class="brow-bar b-green" id="bbarPD101" style="width:0%"></div>
+                        </div>
+                        <span class="brow-stat"><strong id="bvalPD101">0</strong> / <span id="btotalPD101">0</span></span>
+                        <span class="brow-pct" id="bpctPD101">0%</span>
+                    </div>
+                    <div class="brow">
+                        <span class="brow-label">PD301</span>
+                        <div class="brow-bar-wrap">
+                            <div class="brow-bar b-blue" id="bbarPD301" style="width:0%"></div>
+                        </div>
+                        <span class="brow-stat"><strong id="bvalPD301">0</strong> / <span id="btotalPD301">0</span></span>
+                        <span class="brow-pct" id="bpctPD301">0%</span>
+                    </div>
+                    <div class="brow">
+                        <span class="brow-label">JSON</span>
+                        <div class="brow-bar-wrap">
+                            <div class="brow-bar b-amber" id="bbarJSON" style="width:0%"></div>
+                        </div>
+                        <span class="brow-stat"><strong id="bvalJSON">0</strong> / <span id="btotalJSON">0</span></span>
+                        <span class="brow-pct" id="bpctJSON">0%</span>
+                    </div>
+                    <div class="brow">
+                        <span class="brow-label">Sensitif ⚠</span>
+                        <div class="brow-bar-wrap">
+                            <div class="brow-bar b-red" id="bbarSensitive" style="width:0%"></div>
+                        </div>
+                        <span class="brow-stat"><strong id="bvalSensitive">0</strong> / <span id="btotalSensitive">0</span></span>
+                        <span class="brow-pct" id="bpctSensitive">0%</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="table-container">
             <table>
                 <thead>
-                    <tr><th>No</th><th>RN Number</th><th>PD101</th><th>PD301</th><th>Json Mapping</th></tr>
+                    <tr>
+                        <th>#</th>
+                        <th>RN Number</th>
+                        <th>PD101</th>
+                        <th>PD301</th>
+                        <th>JSON Mapping</th>
+                    </tr>
                 </thead>
-                <tbody id="resultTable"></tbody>
+                <tbody id="resultTable">
+                    <tr class="empty-row">
+                        <td colspan="5">— Tiada data. Jalankan Compare dahulu. —</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     </div>
+
 </div>
 
 <script src="script.js"></script>
