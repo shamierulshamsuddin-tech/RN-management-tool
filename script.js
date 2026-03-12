@@ -1,40 +1,28 @@
-/* --- TAB NAVIGATION --- */
 function showTab(id) {
     document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
     document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
     document.getElementById(id).classList.add("active");
-    // Gunakan event untuk mencari butang jika tiada parameter context
-    if (event) event.currentTarget.classList.add("active");
+    event.currentTarget.classList.add("active");
 }
 
-/* --- CONVERT TOOLS --- */
+function checkStrict(str) {
+    return /[()_.,]/.test(str);
+}
+
 function convertToSQL() {
-    let list = getList("convertInput").map(x => x.replace(/['",()]/g, ""));
-    document.getElementById("convertOutput").value = list.map(rn => `'${rn}',`).join("\n");
-    document.getElementById("totalInput").innerText = list.length;
+    let raw = getList("convertInput");
+    let formatted = raw.map(rn => `'${rn}'`).join(",\n");
+    document.getElementById("convertOutput").value = formatted;
+    document.getElementById("totalInput").innerText = raw.length;
+    document.getElementById("convertOutput").select();
 }
 
 function convertToBase() {
     let raw = document.getElementById("convertInput").value;
-    let cleaned = raw.split(/[\n,]+/).map(x => x.replace(/['"()]/g, "").trim()).filter(x => x !== "");
+    let cleaned = raw.split(/[\n,]+/).map(x => x.replace(/['"()]/g, "").trim()).filter(x => x);
     document.getElementById("convertOutput").value = cleaned.join("\n");
-    document.getElementById("totalInput").innerText = cleaned.length;
 }
 
-function copyOutput() {
-    let out = document.getElementById("convertOutput");
-    if(!out.value) return;
-    out.select();
-    document.execCommand("copy");
-    alert("Copied! ✅");
-}
-
-function clearConvert() {
-    ["convertInput", "convertOutput"].forEach(id => document.getElementById(id).value = "");
-    document.getElementById("totalInput").innerText = "0";
-}
-
-/* --- COMPARE LOGIC --- */
 function compareRN() {
     let master = getList("rnNumber");
     let pd101 = getList("pd101");
@@ -45,31 +33,17 @@ function compareRN() {
     let jsonRNs = [];
     jsonLines.forEach(line => {
         let parts = line.split(/[|\t]+/);
-        let v1 = parts[0]?.trim();
-        let v2 = parts[1]?.trim() || "";
+        let v1 = parts[0]?.trim(), v2 = parts[1]?.trim() || "";
         if(v1) {
             let rn = v1.toUpperCase().includes("RN") ? v1 : (v2.toUpperCase().includes("RN") ? v2 : v1);
-            let file = (v1 === rn) ? v2 : v1;
-            jsonMap[rn] = file || "Found";
+            jsonMap[rn] = v1 === rn ? v2 : v1;
             jsonRNs.push(rn);
         }
     });
 
     if (master.length === 0) {
-        master = [...new Set([...pd101, ...pd301, ...jsonRNs])];
+        master = [...new Set([...pd101, ...pd301, ...jsonRNs])].sort();
     }
-
-    if (master.length === 0) return alert("Please provide some data!");
-
-    const has101 = pd101.length > 0;
-    const has301 = pd301.length > 0;
-    const hasJ = jsonLines.length > 0;
-
-    let head = document.querySelector("table thead tr");
-    head.innerHTML = `<th>No</th><th>RN Number</th>`;
-    if(has101) head.innerHTML += `<th>PD101</th>`;
-    if(has301) head.innerHTML += `<th>PD301</th>`;
-    if(hasJ) head.innerHTML += `<th>Json_filename</th>`;
 
     let body = document.getElementById("resultTable");
     body.innerHTML = "";
@@ -79,88 +53,84 @@ function compareRN() {
         let in1 = pd101.includes(rn);
         let in3 = pd301.includes(rn);
         let inJ = jsonMap.hasOwnProperty(rn);
+        let isStrict = checkStrict(rn);
+
         if(in1) m1++; if(in3) m3++; if(inJ) mJ++;
 
-        let row = `<tr><td>${i+1}</td><td>${rn}</td>`;
-        if(has101) row += `<td>${in1 ? "✔️" : "❌"}</td>`;
-        if(has301) row += `<td>${in3 ? "✔️" : "❌"}</td>`;
-        if(hasJ) row += `<td>${inJ ? "✔️ ("+jsonMap[rn]+")" : "❌"}</td>`;
-        row += `</tr>`;
+        let row = `<tr class="${isStrict ? 'row-sensitive' : ''}">
+            <td>${i+1}</td>
+            <td class="rn-cell">${rn}</td>
+            <td>${in1 ? "✔️" : "❌"}</td>
+            <td>${in3 ? "✔️" : "❌"}</td>
+            <td>${inJ ? "✔️ (" + (jsonMap[rn] || "Found") + ")" : "❌"}</td>
+        </tr>`;
         body.insertAdjacentHTML('beforeend', row);
     });
 
-    document.getElementById("totalRnNumber").innerText = master.length;
-    updateDash(master.length, m1, m3, mJ, has1, has3, hasJ);
+    updateDashboard(master.length, m1, m3, mJ);
 }
 
-function updateDash(total, m1, m3, mJ, has1, has3, hasJ) {
+function updateDashboard(total, m1, m3, mJ) {
     document.getElementById("dashTotal").innerText = total;
     document.getElementById("dash101").innerText = m1;
     document.getElementById("dash301").innerText = m3;
     document.getElementById("dashJson").innerText = mJ;
 
-    let activeCols = [has1, has3, hasJ].filter(v => v).length;
-    let score = (has1 ? m1 : 0) + (has3 ? m3 : 0) + (hasJ ? mJ : 0);
-    let perc = total > 0 ? Math.round((score / (total * (activeCols || 1))) * 100) : 0;
-    
+    let perc = total > 0 ? Math.round(((m1 + m3 + mJ) / (total * 3)) * 100) : 0;
     let pb = document.getElementById("progressBar");
     pb.style.width = perc + "%";
     pb.innerText = perc + "%";
-    document.getElementById("progressText").innerText = `Integriti: ${perc}%`;
-}
-
-/* --- EXPORT FIX FOR PDF --- */
-function getExportData() {
-    const data = [];
-    const headers = [];
-    document.querySelectorAll("table thead th").forEach(th => headers.push(th.innerText));
-
-    document.querySelectorAll("#resultTable tr").forEach(tr => {
-        const row = [];
-        tr.querySelectorAll("td").forEach((td, i) => {
-            let val = td.innerText;
-            if (val.includes("✔️")) {
-                let m = val.match(/\(([^)]+)\)/);
-                val = m ? m[1] : "Yes";
-            } else if (val.includes("❌")) {
-                val = "No";
-            }
-            row.push(val);
-        });
-        data.push(row);
-    });
-    return { headers, data };
 }
 
 function downloadPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    const { headers, data } = getExportData();
-    if (!data.length) return;
-    doc.setTextColor(75, 29, 142);
-    doc.setFontSize(18);
-    doc.text("RN Analysis Report", 14, 20);
-    doc.autoTable({ head: [headers], body: data, startY: 30, theme: 'striped', headStyles: {fillColor:[75, 29, 142]} });
+    const rows = [];
+    document.querySelectorAll("#resultTable tr").forEach(tr => {
+        const row = [];
+        tr.querySelectorAll("td").forEach(td => {
+            let val = td.innerText.trim();
+            if(val.includes("✔️")) val = "YES";
+            else if(val.includes("❌")) val = "NO";
+            row.push(val);
+        });
+        rows.push(row);
+    });
+    doc.autoTable({ head: [['No', 'RN', '101', '301', 'JSON']], body: rows });
     doc.save("RN_Report.pdf");
 }
 
 function downloadCSV() {
-    const { headers, data } = getExportData();
-    if(!data.length) return;
-    let csv = "data:text/csv;charset=utf-8," + headers.join(",") + "\n" + data.map(r => r.join(",")).join("\n");
+    let rows = [["No", "RN", "PD101", "PD301", "JSON"]];
+    document.querySelectorAll("#resultTable tr").forEach(tr => {
+        let r = [];
+        tr.querySelectorAll("td").forEach(td => r.push(td.innerText.replace(/✔️/g, "YES").replace(/❌/g, "NO")));
+        rows.push(r);
+    });
+    let csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
     let link = document.createElement("a");
-    link.href = encodeURI(csv);
-    link.download = "RN_Comparison.csv";
+    link.setAttribute("href", encodeURI(csvContent));
+    link.setAttribute("download", "Comparison.csv");
     link.click();
 }
 
 function getList(id) {
     let el = document.getElementById(id);
-    return el ? el.value.split("\n").map(x => x.trim()).filter(x => x !== "") : [];
+    return el ? el.value.split("\n").map(x => x.trim()).filter(x => x) : [];
+}
+
+function clearConvert() {
+    document.getElementById("convertInput").value = "";
+    document.getElementById("convertOutput").value = "";
 }
 
 function clearCompare() {
     ["rnNumber", "pd101", "pd301", "jsonFile"].forEach(id => document.getElementById(id).value = "");
     document.getElementById("resultTable").innerHTML = "";
-    updateDash(0,0,0,0,false,false,false);
+}
+
+function copyOutput() {
+    let out = document.getElementById("convertOutput");
+    out.select();
+    document.execCommand("copy");
 }
