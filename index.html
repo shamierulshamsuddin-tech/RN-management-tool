@@ -376,23 +376,6 @@ header {
     margin-bottom: 8px;
 }
 
-/* ── SMART PARSE HINT BOX ── */
-.hint-box {
-    background: var(--blue-bg);
-    border: 1.5px solid var(--blue-border);
-    border-radius: var(--radius);
-    padding: 10px 14px;
-    margin-bottom: 10px;
-    font-family: var(--font-mono);
-    font-size: 0.69rem;
-    color: var(--blue);
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    line-height: 1.5;
-}
-
-.hint-icon { flex-shrink: 0; font-size: 0.85rem; }
 
 textarea {
     width: 100%; height: 120px;
@@ -811,17 +794,8 @@ tbody tr:hover td { background: var(--purple-50); }
     <!-- SQL HELPER TAB -->
     <div id="convert" class="tab-content">
 
-        <div class="hint-box">
-            <span class="hint-icon">💡</span>
-            <span>
-                <strong>Smart Parse:</strong> Supports pelbagai format input — satu baris, space-separated, comma-separated, atau campuran.
-                Contoh: <code>RN123 RN 456 RN789, RN 1011</code> → akan dipisahkan & dinormalisasi secara automatik.
-                Space antara "RN" dan nombor (e.g. <code>RN 3122</code>) akan ditukar kepada <code>RN3122</code>.
-            </span>
-        </div>
-
         <div class="panel-label">Input</div>
-        <textarea id="convertInput" placeholder="Tampal RN di sini — boleh satu baris, space-separated, atau comma-separated...&#10;Contoh: RN123 RN 456&#10;RN789, RN 1011"></textarea>
+        <textarea id="convertInput" placeholder="Tampal RN di sini, satu baris satu RN..."></textarea>
 
         <div class="btn-group">
             <button class="btn-primary" onclick="convertToSQL()"><span>⌗</span> Add SQL Quotes</button>
@@ -852,7 +826,7 @@ tbody tr:hover td { background: var(--purple-50); }
                 <textarea id="pd301" placeholder="Satu RN per baris..."></textarea>
             </div>
             <div class="input-field">
-                <label>JSON Mapping <span class="label-hint">(RN | value)</span></label>
+                <label>JsonFileName <span class="label-hint">(RN | value)</span></label>
                 <textarea id="jsonFile" placeholder="RN123 | nilai&#10;RN456 | nilai2"></textarea>
             </div>
         </div>
@@ -930,7 +904,7 @@ tbody tr:hover td { background: var(--purple-50); }
                         <th>RN Number</th>
                         <th>PD101</th>
                         <th>PD301</th>
-                        <th>JSON Mapping</th>
+                        <th>JsonFileName</th>
                     </tr>
                 </thead>
                 <tbody id="resultTable">
@@ -1297,7 +1271,7 @@ function downloadPDF() {
 
     doc.autoTable({
         startY: 38,
-        head: [['#', 'RN Number', 'PD101', 'PD301', 'JSON Mapping']],
+        head: [['#', 'RN Number', 'PD101', 'PD301', 'JsonFileName']],
         body: rows,
         styles: { font: 'courier', fontSize: 8.5 },
         headStyles: { fillColor: [83, 32, 181], textColor: 255 },
@@ -1310,25 +1284,50 @@ function downloadPDF() {
 
 /* ── Export CSV ── */
 function downloadCSV() {
-    const rows = [['No', 'RN', 'PD101', 'PD301', 'JSON Mapping']];
+    const rows = [['No', 'RN', 'PD101', 'PD301', 'JsonFileName']];
     document.querySelectorAll('#resultTable tr').forEach(tr => {
         if (tr.classList.contains('empty-row')) return;
+        const tds = tr.querySelectorAll('td');
+        if (tds.length !== 5) return;
+
         const r = [];
-        tr.querySelectorAll('td').forEach(td => {
-            let val = td.innerText.replace(/✔\s*/g,'YES').replace(/✘\s*/g,'NO').trim();
+        tds.forEach((td, idx) => {
+            let val = td.innerText.trim();
+
+            if (idx === 2 || idx === 3) {
+                // PD101 / PD301 — Yes atau No sahaja
+                val = val.includes('YES') ? 'Yes' : 'No';
+            } else if (idx === 4) {
+                // JSON Mapping — nama file sahaja (buang "YES " prefix & icon)
+                if (val.includes('NO') || val.includes('✘')) {
+                    val = 'No';
+                } else {
+                    // Buang ✔ dan "YES" — ambil nama file sahaja
+                    val = val.replace(/[✔✘]\s*/g, '').replace(/^YES\s*/i, '').trim();
+                    if (!val) val = 'Yes';
+                }
+            } else {
+                // No & RN — kekal asal
+                val = val.replace(/✔\s*/g, '').replace(/✘\s*/g, '').trim();
+            }
+
             if (val.includes(',')) val = `"${val}"`;
             r.push(val);
         });
-        if (r.length === 5) rows.push(r);
+
+        rows.push(r);
     });
 
-    const csv = 'data:text/csv;charset=utf-8,\uFEFF' + rows.map(e => e.join(',')).join('\n');
+    const csvContent = '\uFEFF' + rows.map(e => e.join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = encodeURI(csv);
+    a.href = url;
     a.download = 'RN_Comparison.csv';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
 </script>
 </body>
