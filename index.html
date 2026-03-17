@@ -4,25 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iqbal RN Tool</title>
-
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- jsPDF (CDN) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
 <style>
-/* ===========================
-   IQBAL RN TOOL — Styles
-   Theme: Refined Amethyst · Mac 2026
-   GitHub Pages Compatible
-   =========================== */
-
 :root {
     --bg:           #fafafa;
     --white:        #ffffff;
-
     --purple-900:   #2d0a6e;
     --purple-800:   #3d1291;
     --purple-700:   #5320b5;
@@ -33,41 +22,32 @@
     --purple-200:   #ddd6fe;
     --purple-100:   #ede9fe;
     --purple-50:    #f5f3ff;
-
     --green:        #059669;
     --green-bg:     #ecfdf5;
     --green-border: #a7f3d0;
-
     --red:          #dc2626;
     --red-bg:       #fef2f2;
     --red-border:   #fecaca;
-
     --amber:        #b45309;
     --amber-bg:     #fffbeb;
     --amber-border: #fde68a;
-
     --blue:         #2563eb;
     --blue-bg:      #eff6ff;
     --blue-border:  #bfdbfe;
-
     --text:         #1a0533;
     --text-2:       #4a3265;
     --text-3:       #7c6a9a;
     --text-4:       #b8aed0;
-
     --border:       #e8e0f5;
     --border-2:     #d5c8f0;
-
     --shadow-sm:    0 1px 3px rgba(45,10,110,0.07);
     --shadow-md:    0 4px 20px rgba(45,10,110,0.09), 0 2px 6px rgba(45,10,110,0.05);
     --shadow-lg:    0 12px 40px rgba(45,10,110,0.11), 0 4px 14px rgba(45,10,110,0.07);
     --shadow-glow:  0 0 0 3px rgba(124,58,237,0.15);
-
     --radius-sm:    6px;
     --radius:       10px;
     --radius-lg:    16px;
     --radius-xl:    24px;
-
     --font-body:    'Inter', sans-serif;
     --font-mono:    'Courier New', Courier, monospace;
 }
@@ -104,7 +84,6 @@ body::after {
     pointer-events: none; z-index: 0;
 }
 
-/* ── Container ── */
 .container {
     position: relative; z-index: 1;
     width: 100%; max-width: 1060px;
@@ -122,7 +101,6 @@ body::after {
     to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Header ── */
 header {
     display: flex;
     justify-content: space-between;
@@ -206,7 +184,6 @@ header {
     50%       { opacity: 0.3; }
 }
 
-/* ── Tabs ── */
 .tabs {
     display: flex;
     gap: 3px;
@@ -252,7 +229,6 @@ header {
     to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── DASHBOARD ── */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -392,7 +368,6 @@ header {
     color: var(--text-3);
 }
 
-/* ── FORM ── */
 .panel-label {
     font-family: var(--font-mono);
     font-size: 0.64rem; font-weight: 500;
@@ -400,6 +375,24 @@ header {
     text-transform: uppercase; letter-spacing: 0.1em;
     margin-bottom: 8px;
 }
+
+/* ── SMART PARSE HINT BOX ── */
+.hint-box {
+    background: var(--blue-bg);
+    border: 1.5px solid var(--blue-border);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    font-family: var(--font-mono);
+    font-size: 0.69rem;
+    color: var(--blue);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.5;
+}
+
+.hint-icon { flex-shrink: 0; font-size: 0.85rem; }
 
 textarea {
     width: 100%; height: 120px;
@@ -459,7 +452,6 @@ textarea[readonly] {
 
 .row-count strong { color: var(--purple-700); }
 
-/* ── BUTTONS ── */
 .btn-group { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0; }
 
 button {
@@ -520,7 +512,6 @@ button:active { transform: scale(0.96) !important; }
     box-shadow: 0 4px 14px rgba(220,38,38,0.28);
 }
 
-/* ── SUMMARY PANEL ── */
 .summary-panel {
     background: var(--white);
     border: 1.5px solid var(--border);
@@ -656,7 +647,6 @@ button:active { transform: scale(0.96) !important; }
     text-align: right; white-space: nowrap;
 }
 
-/* ── TABLE ── */
 .table-container {
     margin-top: 18px;
     border: 1.5px solid var(--border);
@@ -722,13 +712,11 @@ tbody tr:hover td { background: var(--purple-50); }
     border: 1px solid #fecaca;
 }
 
-/* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--purple-50); }
 ::-webkit-scrollbar-thumb { background: var(--purple-300); border-radius: 99px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--purple-500); }
 
-/* ── Responsive ── */
 @media (max-width: 640px) {
     .container { padding: 22px 18px; border-radius: var(--radius-lg); }
     body { padding: 16px 12px 40px; }
@@ -751,13 +739,12 @@ tbody tr:hover td { background: var(--purple-50); }
 
 <div class="container">
 
-    <!-- ── HEADER ── -->
     <header>
         <div class="header-left">
             <div class="logo-wrap">◈</div>
             <div class="header-text">
                 <h1>RN Management Tool</h1>
-                <p class="subtitle">Iqbal · Mac 2026 · v2.0</p>
+                <p class="subtitle">Iqbal · Mac 2026 · v2.1</p>
             </div>
         </div>
         <div class="header-right">
@@ -768,7 +755,6 @@ tbody tr:hover td { background: var(--purple-50); }
         </div>
     </header>
 
-    <!-- ── TABS ── -->
     <div class="tabs">
         <button class="tab-btn active" onclick="showTab('dashboard', this)">
             <span class="tab-icon">▦</span> Dashboard
@@ -781,11 +767,8 @@ tbody tr:hover td { background: var(--purple-50); }
         </button>
     </div>
 
-    <!-- ══════════════════════════════
-         DASHBOARD TAB
-    ══════════════════════════════ -->
+    <!-- DASHBOARD TAB -->
     <div id="dashboard" class="tab-content active">
-
         <div class="stats-grid">
             <div class="stat-card c-purple">
                 <div class="stat-icon-row"><div class="stat-icon">📊</div></div>
@@ -823,16 +806,22 @@ tbody tr:hover td { background: var(--purple-50); }
             </div>
             <p class="progress-desc" id="progressText">Run a comparison to see coverage stats.</p>
         </div>
-
     </div>
 
-    <!-- ══════════════════════════════
-         SQL HELPER TAB
-    ══════════════════════════════ -->
+    <!-- SQL HELPER TAB -->
     <div id="convert" class="tab-content">
 
+        <div class="hint-box">
+            <span class="hint-icon">💡</span>
+            <span>
+                <strong>Smart Parse:</strong> Supports pelbagai format input — satu baris, space-separated, comma-separated, atau campuran.
+                Contoh: <code>RN123 RN 456 RN789, RN 1011</code> → akan dipisahkan & dinormalisasi secara automatik.
+                Space antara "RN" dan nombor (e.g. <code>RN 3122</code>) akan ditukar kepada <code>RN3122</code>.
+            </span>
+        </div>
+
         <div class="panel-label">Input</div>
-        <textarea id="convertInput" placeholder="Tampal RN di sini, satu baris satu RN..."></textarea>
+        <textarea id="convertInput" placeholder="Tampal RN di sini — boleh satu baris, space-separated, atau comma-separated...&#10;Contoh: RN123 RN 456&#10;RN789, RN 1011"></textarea>
 
         <div class="btn-group">
             <button class="btn-primary" onclick="convertToSQL()"><span>⌗</span> Add SQL Quotes</button>
@@ -847,11 +836,8 @@ tbody tr:hover td { background: var(--purple-50); }
         <textarea id="convertOutput" readonly placeholder="Hasil akan muncul di sini..."></textarea>
     </div>
 
-    <!-- ══════════════════════════════
-         RN COMPARE TAB
-    ══════════════════════════════ -->
+    <!-- RN COMPARE TAB -->
     <div id="compare" class="tab-content">
-
         <div class="grid">
             <div class="input-field">
                 <label>Master List</label>
@@ -878,7 +864,6 @@ tbody tr:hover td { background: var(--purple-50); }
             <button class="btn-danger" onclick="clearCompare()"><span>✕</span> Clear All</button>
         </div>
 
-        <!-- Summary Panel -->
         <div class="summary-panel" id="summaryPanel" style="display:none">
             <div class="summary-header">
                 <span class="summary-title">📊 Ringkasan Perbandingan</span>
@@ -961,8 +946,8 @@ tbody tr:hover td { background: var(--purple-50); }
 
 <script>
 /* ===========================
-   IQBAL RN TOOL — Script
-   Update: Mac 2026
+   IQBAL RN TOOL — Script v2.1
+   Fix: Smart Parse — Mac 2026
    =========================== */
 
 /* ── Tab Navigation ── */
@@ -976,38 +961,143 @@ function showTab(id, btn) {
 /* ── Utility ── */
 function checkStrict(str) { return /[()_.,]/.test(str); }
 
-function getList(id) {
-    const el = document.getElementById(id);
-    return el ? el.value.split('\n').map(x => x.trim()).filter(x => x) : [];
-}
-
 function escapeHtml(str) {
     if (!str) return '';
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 /* ─────────────────────────────────────────
+   SMART PARSE — FIX UTAMA v2.1
+   
+   Masalah asal: getList() hanya split by '\n'
+   Jadi "RN123 RN1234 RN 3122" → 1 item sahaja
+   
+   Fix baru:
+   1. Split by newline ATAU comma dahulu
+   2. Untuk setiap chunk, check kalau ada
+      multiple RN dalam satu chunk (space-separated)
+   3. Normalize "RN 3122" → "RN3122"
+      (buang space antara prefix RN/rn dan digit)
+   ───────────────────────────────────────── */
+function smartParseRNs(rawText) {
+    if (!rawText || !rawText.trim()) return [];
+
+    // Step 1: Split by newline atau comma
+    const chunks = rawText.split(/[\n,]+/);
+
+    const results = [];
+
+    chunks.forEach(chunk => {
+        chunk = chunk.trim();
+        if (!chunk) return;
+
+        // Step 2: Buang petikan SQL kalau ada ('RN123' → RN123)
+        chunk = chunk.replace(/^'(.*)'$/, '$1').trim();
+
+        // Step 3: Normalize space dalam RN — "RN 3122" → "RN3122"
+        // Pattern: huruf diikuti space diikuti digit
+        // Handles: RN 123, rn 123, Rn 123, etc.
+        // Tapi JANGAN buang spaces antara token berbeza
+        // Approach: replace pattern [letters][space(s)][digits] → [letters][digits]
+        // Kita buat normalize selepas tokenize
+
+        // Step 4: Detect kalau ada multiple RN dalam satu chunk
+        // Contoh: "RN123 RN1234 RN 3122"
+        // Strategy: split by spaces, then regroup tokens yang form valid RN
+
+        // Tokenize by space
+        const tokens = chunk.split(/\s+/).filter(t => t);
+
+        if (tokens.length === 1) {
+            // Single token — normalize dan masuk terus
+            const norm = normalizeRN(tokens[0]);
+            if (norm) results.push(norm);
+            return;
+        }
+
+        // Multiple tokens — kena detect pattern
+        // RN token boleh jadi:
+        //   Case A: "RN123"    → complete RN dalam satu token
+        //   Case B: "RN" "123" → prefix dan nombor terpisah (space dalam RN)
+        // 
+        // Algorithm: iterate tokens, kalau token semasa nampak macam
+        // prefix (letters only, match /^[A-Za-z]+$/), check kalau
+        // token seterusnya adalah digit — kalau ya, gabung sebagai satu RN
+
+        let i = 0;
+        while (i < tokens.length) {
+            const t = tokens[i];
+
+            // Check kalau token ni prefix-only (e.g. "RN", "rn")
+            // dan token seterusnya digit
+            if (/^[A-Za-z]+$/.test(t) && i + 1 < tokens.length && /^\d+$/.test(tokens[i + 1])) {
+                // Gabung: "RN" + "123" → "RN123"
+                const combined = t + tokens[i + 1];
+                const norm = normalizeRN(combined);
+                if (norm) results.push(norm);
+                i += 2; // skip dua token
+            } else {
+                // Token biasa — normalize dan masuk
+                const norm = normalizeRN(t);
+                if (norm) results.push(norm);
+                i++;
+            }
+        }
+    });
+
+    // Buang duplicates, kekalkan order
+    const seen = new Set();
+    return results.filter(rn => {
+        if (seen.has(rn)) return false;
+        seen.add(rn);
+        return true;
+    });
+}
+
+/* Normalize satu RN token:
+   - Buang petikan
+   - Uppercase
+   - Buang internal space (e.g. "RN 123" → "RN123" kalau tiba dalam satu token)
+   - Return null kalau kosong
+*/
+function normalizeRN(token) {
+    if (!token) return null;
+    // Buang leading/trailing quotes
+    token = token.replace(/^['"]|['"]$/g, '').trim();
+    if (!token) return null;
+    // Buang internal space antara huruf dan digit (e.g. "RN 123")
+    token = token.replace(/([A-Za-z])\s+(\d)/g, '$1$2');
+    return token;
+}
+
+/* getList untuk textarea biasa (Compare tab) — smart parse */
+function getList(id) {
+    const el = document.getElementById(id);
+    if (!el) return [];
+    return smartParseRNs(el.value);
+}
+
+/* ─────────────────────────────────────────
    SQL HELPER
    ───────────────────────────────────────── */
-
-/* Mac 2026: Conditional check — jangan tambah petikan kalau dah ada */
 function convertToSQL() {
-    const raw = getList('convertInput');
-    const formatted = raw.map(rn => {
+    const raw = document.getElementById('convertInput').value;
+    const parsed = smartParseRNs(raw);
+
+    const formatted = parsed.map(rn => {
         if (rn.startsWith("'") && rn.endsWith("'")) return rn;
         return `'${rn}'`;
     }).join(',\n');
+
     document.getElementById('convertOutput').value = formatted;
-    document.getElementById('totalInput').innerText = raw.length;
-    document.getElementById('convertOutput').select();
+    document.getElementById('totalInput').innerText = parsed.length;
 }
 
-/* Mac 2026: Hanya buang ' dan " — simbol teknikal dikekalkan */
 function convertToBase() {
     const raw = document.getElementById('convertInput').value;
-    const cleaned = raw.split(/[\n,]+/).map(x => x.replace(/'|"/g, '').trim()).filter(x => x);
-    document.getElementById('convertOutput').value = cleaned.join('\n');
-    document.getElementById('totalInput').innerText = cleaned.length;
+    const parsed = smartParseRNs(raw);
+    document.getElementById('convertOutput').value = parsed.join('\n');
+    document.getElementById('totalInput').innerText = parsed.length;
 }
 
 function copyOutput() {
@@ -1027,6 +1117,17 @@ function clearConvert() {
     document.getElementById('totalInput').innerText = '0';
 }
 
+/* Live row count update */
+document.addEventListener('DOMContentLoaded', () => {
+    const inp = document.getElementById('convertInput');
+    if (inp) {
+        inp.addEventListener('input', () => {
+            const parsed = smartParseRNs(inp.value);
+            document.getElementById('totalInput').innerText = parsed.length;
+        });
+    }
+});
+
 /* ─────────────────────────────────────────
    RN COMPARE
    ───────────────────────────────────────── */
@@ -1036,14 +1137,20 @@ function compareRN() {
     const pd301     = getList('pd301');
     const jsonLines = getList('jsonFile');
 
+    // JSON mapping — kekalkan pipe-separator logic
+    const jsonRaw = document.getElementById('jsonFile').value;
     const jsonMap = {}, jsonRNs = [];
-    jsonLines.forEach(line => {
+    jsonRaw.split('\n').forEach(line => {
+        line = line.trim();
+        if (!line) return;
         const parts = line.split(/[|\t]+/);
         const v1 = parts[0]?.trim(), v2 = parts[1]?.trim() || '';
         if (v1) {
-            const rn = v1.toUpperCase().includes('RN') ? v1 : (v2.toUpperCase().includes('RN') ? v2 : v1);
-            jsonMap[rn] = (v1 === rn) ? v2 : v1;
-            jsonRNs.push(rn);
+            const rn = normalizeRN(v1.toUpperCase().includes('RN') ? v1 : (v2.toUpperCase().includes('RN') ? v2 : v1));
+            if (rn) {
+                jsonMap[rn] = (v1 === rn) ? v2 : v1;
+                jsonRNs.push(rn);
+            }
         }
     });
 
@@ -1156,9 +1263,7 @@ function clearCompare() {
     updateDashboard(0, 0, 0, 0);
 }
 
-/* ─────────────────────────────────────────
-   EXPORT PDF
-   ───────────────────────────────────────── */
+/* ── Export PDF ── */
 function downloadPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
@@ -1203,9 +1308,7 @@ function downloadPDF() {
     doc.save('RN_Report.pdf');
 }
 
-/* ─────────────────────────────────────────
-   EXPORT CSV
-   ───────────────────────────────────────── */
+/* ── Export CSV ── */
 function downloadCSV() {
     const rows = [['No', 'RN', 'PD101', 'PD301', 'JSON Mapping']];
     document.querySelectorAll('#resultTable tr').forEach(tr => {
