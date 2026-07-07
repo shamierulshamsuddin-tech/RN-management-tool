@@ -113,6 +113,8 @@ button:active{transform:scale(.96)!important}
 .btn-success:hover{background:var(--green);color:white;border-color:var(--green);transform:translateY(-1px);box-shadow:0 4px 14px rgba(5,150,105,.3)}
 .btn-danger{background:var(--red-bg);color:var(--red);border:1.5px solid var(--red-border)}
 .btn-danger:hover{background:var(--red);color:white;border-color:var(--red);transform:translateY(-1px);box-shadow:0 4px 14px rgba(220,38,38,.28)}
+.btn-info{background:var(--blue-bg);color:var(--blue);border:1.5px solid var(--blue-border)}
+.btn-info:hover{background:var(--blue);color:white;border-color:var(--blue);transform:translateY(-1px);box-shadow:0 4px 14px rgba(37,99,235,.28)}
 .table-container{margin-top:18px;border:1.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;overflow-x:auto;box-shadow:var(--shadow-sm)}
 table{width:100%;border-collapse:collapse}
 thead tr{background:linear-gradient(135deg,var(--purple-800) 0%,var(--purple-600) 100%)}
@@ -234,11 +236,11 @@ tbody tr:hover td{background:var(--purple-50)}
             <div class="logo-wrap">◈</div>
             <div class="header-text">
                 <h1>RN Casemix Ticket Tool</h1>
-                <p class="subtitle">Iqbal · Mac 2026 · v2.0</p>
+                <p class="subtitle">Iqbal · July 2026 · v2.1</p>
             </div>
         </div>
         <div class="header-right">
-            <span class="version-badge">Update Mac 2026</span>
+            <span class="version-badge">Update July 2026</span>
             <div class="status-pill"><span class="status-dot"></span> Ready</div>
         </div>
     </header>
@@ -293,6 +295,7 @@ tbody tr:hover td{background:var(--purple-50)}
         <textarea id="convertInput" placeholder="Tampal RN di sini, satu baris satu RN..."></textarea>
         <div class="btn-group">
             <button class="btn-primary" onclick="convertToSQL()"><span>⌗</span> Add SQL Quotes</button>
+            <button class="btn-info" onclick="convertToCommaOnly()"><span>,</span> Add Comma (,) Only</button>
             <button class="btn-secondary" onclick="convertToBase()"><span>⌫</span> Remove Formatting</button>
             <button class="btn-success" onclick="copyOutput()"><span>⎘</span> Copy</button>
             <button class="btn-danger" onclick="clearConvert()"><span>✕</span> Clear</button>
@@ -446,6 +449,18 @@ function convertToSQL(){
     const formatted=raw.map(rn=>(rn.startsWith("'")&&rn.endsWith("'"))?rn:`'${rn}'`).join(",\n");
     document.getElementById("convertOutput").value=formatted;
     document.getElementById("totalInput").innerText=raw.length;
+    document.getElementById("convertOutput").select();
+}
+
+/* Add Comma (,) Only — same layout as SQL Quotes but without quotes, e.g.
+   rn 123,
+   rn 241 */
+function convertToCommaOnly(){
+    const raw=getList("convertInput");
+    const cleaned=raw.map(rn=>rn.replace(/^['"]|['"]$/g,"").trim()).filter(x=>x);
+    const formatted=cleaned.join(",\n");
+    document.getElementById("convertOutput").value=formatted;
+    document.getElementById("totalInput").innerText=cleaned.length;
     document.getElementById("convertOutput").select();
 }
 
